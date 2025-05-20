@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { FcGoogle } from "react-icons/fc";
+import { BsApple } from "react-icons/bs";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -67,9 +68,12 @@ export default function CardWithForm() {
       },
     });
   }
-
   const handleGoogleSignIn = () => {
     signIn("google", { callbackUrl: "/" });
+  };
+
+  const handleAppleSignIn = () => {
+    signIn("apple", { callbackUrl: "/" });
   };
 
   const sendToken = async (email: string) => {
@@ -257,9 +261,7 @@ export default function CardWithForm() {
                     Or continue with
                   </span>
                 </div>
-              </div>
-
-              <Button
+              </div>              <Button
                 type="button"
                 variant="outline"
                 className="w-full flex items-center justify-center gap-2"
@@ -267,6 +269,16 @@ export default function CardWithForm() {
               >
                 <FcGoogle className="h-5 w-5" />
                 <span>Sign in with Google</span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                 className="w-full flex items-center justify-center gap-2"
+                onClick={handleAppleSignIn}
+              >
+                <BsApple className="h-5 w-5" />
+                <span>Sign in with Apple</span>
               </Button>
             </div>
           </CardContent>

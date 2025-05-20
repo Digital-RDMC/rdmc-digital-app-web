@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import AppleProvider from "next-auth/providers/apple";
 import prisma from "./prisma";
 
 // Extend the Session type to include the 'id' property
@@ -105,6 +106,10 @@ export const authOptions: NextAuthOptions = {
           response_type: "code",
         },
       },
+    }),
+    AppleProvider({
+      clientId: process.env.APPLE_ID || "",
+      clientSecret: process.env.APPLE_SECRET || "",
     }),
     CredentialsProvider({
       name: "Credentials",
