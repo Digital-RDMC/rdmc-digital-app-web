@@ -1,12 +1,29 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import React from "react";
 import prisma from "@/lib/prisma";
 import ChartPage from "@/components/chart";
 
 import HiredLeft from "./hiredLeft";
 
+// Define Department interface types
+interface Department {
+  id: string;
+  departmentEn: string;
+  _count: {
+    users: number;
+  };
+}
+
+interface ProcessedDepartment {
+  id: string;
+  departmentEn: string;
+  userCount: number;
+  percentage?: number;
+}
+
 let usersCount = 0;
-const getDepartments = async () => {
+const getDepartments = async (): Promise<React.ReactElement> => {
   const departments = await prisma.department.findMany({
     select: {
       id: true,
@@ -15,7 +32,7 @@ const getDepartments = async () => {
         select: { users: { where: { status: { statusName: "Active" } } } },
       },
     },
-  });
+  }) as Department[];
 
   // Define chart colors
   const chartColors = [
@@ -40,34 +57,27 @@ const getDepartments = async () => {
   // Create proper chart config
   const chartConfig = {
     value: { label: "Employees" },
-  } as Record<string, { label: string; color?: string }>;
-
-  // Add departments to config
-  departments.forEach((department, index) => {
+  } as Record<string, { label: string; color?: string }>;  // Add departments to config
+  departments.forEach((department: Department, index) => {
     chartConfig[department.departmentEn] = {
       label: department.departmentEn,
       color: chartColors[index % chartColors.length],
     };
-  });
-
-  const departmentModified = departments.filter(
-    (department) => department._count.users > 50
-  );
-
-  const processedDepartments = departments
-    .map((department) => {
+  });  const departmentModified = departments.filter(
+    (department: Department) => department._count.users > 50
+  );  const processedDepartments = departments
+    .map((department: Department) => {
       const { _count, ...rest } = department;
       usersCount += _count.users;
       return { ...rest, userCount: _count.users };
     })
-    .map((department) => ({
+    .map((department: ProcessedDepartment) => ({
       ...department,
       percentage: Math.round((department.userCount / usersCount) * 1000) / 10,
     }));
   return (
-    <div>
-      <ChartPage
-        chartData={departments.map((dep, index) => ({
+    <div>      <ChartPage
+        chartData={departments.map((dep: Department, index) => ({
           item: dep.departmentEn,
           value: dep._count.users,
           fill: chartColors[index % chartColors.length],
