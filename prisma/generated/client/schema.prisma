@@ -1,0 +1,218 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String @unique
+  value String
+  users User[]
+}
+
+model Position {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  positionEn String  @unique
+  positionAr String?
+  users      User[]
+}
+
+model Department {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  departmentEn String  @unique
+  departmentAr String?
+  users        User[]
+}
+
+model Division {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  divisionName String @unique
+  users        User[]
+}
+
+model Unit {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  unitName String @unique
+  users    User[]
+}
+
+model Grade {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  gradeOfficial Int     @unique
+  gradeInternal String?
+  users         User[]
+}
+
+model Location {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  locationName String @unique
+  users        User[]
+}
+
+model ContractType {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  typeName String @unique
+  users    User[]
+}
+
+model Nationality {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  nationalityEn String  @unique
+  nationalityAr String?
+  users         User[]
+}
+
+model Gender {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  genderEn String  @unique
+  genderAr String?
+  users    User[]
+}
+
+model MaritalStatus {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  statusEn String  @unique
+  statusAr String?
+  users    User[]
+}
+
+model Entity {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  entityName String @unique
+  users      User[]
+}
+
+model Budget {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  budgetName String @unique
+  users      User[]
+}
+
+model Status {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  statusName String @unique
+  users      User[]
+}
+
+model Auth {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  employeeCode String    @unique
+  userId       String?   @db.ObjectId
+  user         User?     @relation(fields: [userId], references: [id])
+  token        String?
+  refreshToken String?
+  tokenExpiry  DateTime?
+}
+
+model User {
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  employeeCode     String  @unique
+  employeeCategory String?
+  registerName     String?
+
+  // Status
+  statusId String? @db.ObjectId
+  status   Status? @relation(fields: [statusId], references: [id])
+
+  // Dates
+  expectedStartDate DateTime?
+  actualStartDate   DateTime?
+  probationEndDate  DateTime?
+  terminationDate   DateTime?
+  terminationReason String?
+  resignationType   String?
+  dateOfBirth       DateTime?
+
+  // Name information
+  idName      String?
+  idNameAr    String?
+  firstName   String?
+  lastName    String?
+  firstNameAr String?
+  lastNameAr  String?
+
+  // Organization information
+  organizationId String?       @db.ObjectId
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  entityId String? @db.ObjectId
+  entity   Entity? @relation(fields: [entityId], references: [id])
+
+  budgetId String? @db.ObjectId
+  budget   Budget? @relation(fields: [budgetId], references: [id])
+
+  departmentId String?     @db.ObjectId
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  divisionId String?   @db.ObjectId
+  division   Division? @relation(fields: [divisionId], references: [id])
+
+  unitId String? @db.ObjectId
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+
+  positionId String?   @db.ObjectId
+  position   Position? @relation(fields: [positionId], references: [id])
+
+  gradeId String? @db.ObjectId
+  grade   Grade?  @relation(fields: [gradeId], references: [id])
+
+  locationId String?   @db.ObjectId
+  location   Location? @relation(fields: [locationId], references: [id])
+
+  // Manager
+  directManagerCode String?
+  directManagerName String?
+  managerId         String? @db.ObjectId
+  managedBy         User?   @relation("UserManager", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  manages           User[]  @relation("UserManager")
+
+  // Employment information
+  contractTypeId String?       @db.ObjectId
+  contractType   ContractType? @relation(fields: [contractTypeId], references: [id])
+
+  nationalityId String?      @db.ObjectId
+  nationality   Nationality? @relation(fields: [nationalityId], references: [id])
+
+  genderId String? @db.ObjectId
+  gender   Gender? @relation(fields: [genderId], references: [id])
+
+  maritalStatusId String?        @db.ObjectId
+  maritalStatus   MaritalStatus? @relation(fields: [maritalStatusId], references: [id])
+
+  // Contact information
+  email                String  @unique
+  password             String?
+  personalPhoneNumber1 String?
+  corporatePhoneNumber String?
+
+  // ID information
+  idNumber          String?
+  idPlaceOfIssue    String?
+  idAddress         String?
+  idAddressAr       String?
+  idZoneOfResidence String?
+  placeOfBirth      String?
+
+  // Other information
+  companyId      String?
+  cleared        String?
+  disabilityType String?
+
+  // Metadata
+  sourceId      Int?
+  insertionDate DateTime? @default(now())
+  updateDate    DateTime? @updatedAt
+
+  auth Auth[]
+}
