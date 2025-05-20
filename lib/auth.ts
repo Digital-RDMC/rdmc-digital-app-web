@@ -107,10 +107,27 @@ export const authOptions: NextAuthOptions = {
         },
       },
     }),
-    AppleProvider({
-      clientId: process.env.APPLE_ID || "",
-      clientSecret: process.env.APPLE_SECRET || "",
-    }),
+
+
+    // AppleProvider({
+    //   clientId: process.env.APPLE_ID || "",
+    //   clientSecret: process.env.APPLE_SECRET || "",
+    // }),
+
+
+
+ AppleProvider({
+    clientId: process.env.APPLE_CLIENT_ID!,
+    clientSecret: process.env.APPLE_SECRET!,
+    authorization: {
+      params: {
+        scope: 'name email',
+        response_type: 'code id_token',
+        response_mode: 'form_post',
+      },
+    },
+
+ }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
